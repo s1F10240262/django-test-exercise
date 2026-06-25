@@ -97,3 +97,19 @@ class TodoViewTestCase(TestCase):
         self.assertEqual(responce.templates[0].name, 'todo/index.html')
         self.assertEqual(responce.context['tasks'][0], task1)
         self.assertEqual(responce.context['tasks'][1], task2)
+
+    def test_detail_get_success(self):
+        task = Task(title='task1', due_at=timezone.make_aware(datetime(2024, 7, 1)))
+        task.save()
+        client = Client()
+        responce = client.get('/{}/'.format(task.pk))
+
+        self.assertEqual(responce.status_code, 200)
+        self.assertEqual(responce.templates[0].name, 'todo/detail.html')
+        self.assertEqual(responce.context['task'], task)
+
+    def test_detail_get_fail(self):
+        client = Client()
+        responce = client.get('/1/')
+
+        self.assertEqual(responce.status_code, 404)
